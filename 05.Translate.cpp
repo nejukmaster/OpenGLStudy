@@ -138,6 +138,7 @@ int main() {
 		trans = glm::translate(trans, glm::vec3(0.2f, 0.2, 0.2));
 		//glm::rotate(mat,radian,axis)는 주어진 행렬 mat에 axis축으로 radian만큼 회전하는 회전행렬을 적용한다.
 		//회전행렬에 대한 자세한 설명: https://ghebook.blogspot.com/2020/08/blog-post.html
+		//회전행렬 유도:https://gaussian37.github.io/math-la-rotation_matrix/
 		trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
 		//glm::scale(mat, scale)은 주어진 행렬 mat에 크기를 scale비율로 조정하는 스케일 행렬을 적용한다.
 		//스케일 행렬에 대한 자세한 설명: http://www.opengl-tutorial.org/kr/beginners-tutorials/tutorial-3-matrices/
