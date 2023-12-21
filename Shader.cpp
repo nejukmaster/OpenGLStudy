@@ -1,24 +1,20 @@
-﻿//디스크에서 shader를 읽고 컴파일하고 그들을 연결한 후 오류를 확인하는 shader class 생성
+﻿//중복 include를 막기위한 SHADER_H 키워드 선언
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glad/glad.h> // 필요한 모든 OpenGL의 헤더파일을 가져오기 위해 glad를 포함합니다.
+#include <glad/glad.h>
 #include <glm/glm/glm.hpp>
-#include <glm/glm/gtc/matrix_transform.hpp>
-#include <glm/glm/gtc/type_ptr.hpp>
 
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 
-
 class Shader
 {
 public:
     // program ID
     unsigned int ID;
-
     // 생성자는 shader를 읽고 생성합니다.
     //생성자는 인자로 버텍스 쉐이더 파일의 경로와 프래그넌트 쉐이더 파일의 경로를 받습니다.
     Shader(const char* vertexPath, const char* fragmentPath)
@@ -54,7 +50,7 @@ public:
         //파일을 읽지 못했을때 에러 메세지 출력
         catch (std::ifstream::failure& e)
         {
-            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << std::endl;
+            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
         }
         //c_str은 문자열을 char형 포인터로 나타내줍니다.(read only)
         const char* vShaderCode = vertexCode.c_str();
@@ -80,9 +76,11 @@ public:
         // program 내부에서 shader들이 링크 완료되었다면 이제 필요 없으므로 shader들을 삭제
         glDeleteShader(vertex);
         glDeleteShader(fragment);
+
     }
-    // shader를 활성화하고 사용합니다.
-    void use()
+    // activate the shader
+    // ------------------------------------------------------------------------
+    void use() const
     {
         glUseProgram(ID);
     }
@@ -100,18 +98,49 @@ public:
     {
         glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
     }
-    void setMat4(const std::string& name, glm::mat4 value) const
+    void setVec2(const std::string& name, const glm::vec2& value) const
     {
-        glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+        glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+    }
+    void setVec2(const std::string& name, float x, float y) const
+    {
+        glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y);
+    }
+    void setVec3(const std::string& name, const glm::vec3& value) const
+    {
+        glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+    }
+    void setVec3(const std::string& name, float x, float y, float z) const
+    {
+        glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z);
+    }
+    void setVec4(const std::string& name, const glm::vec4& value) const
+    {
+        glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+    }
+    void setVec4(const std::string& name, float x, float y, float z, float w) const
+    {
+        glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, w);
+    }
+    void setMat2(const std::string& name, const glm::mat2& mat) const
+    {
+        glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+    }
+    void setMat3(const std::string& name, const glm::mat3& mat) const
+    {
+        glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+    }
+    void setMat4(const std::string& name, const glm::mat4& mat) const
+    {
+        glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
     }
 
 private:
     // 쉐이더의 오류를 찾아 출력하는 유틸리티 함수입니다.
-    // ------------------------------------------------------------------------
-    void checkCompileErrors(unsigned int shader, std::string type)
+    void checkCompileErrors(GLuint shader, std::string type)
     {
-        int success;
-        char infoLog[1024];
+        GLint success;
+        GLchar infoLog[1024];
         if (type != "PROGRAM")
         {
             glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
@@ -132,5 +161,4 @@ private:
         }
     }
 };
-
 #endif
